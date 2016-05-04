@@ -1,5 +1,4 @@
 package phisher::Controller::Root;
-use phisher ();
 use Moose;
 use namespace::autoclean;
 
@@ -33,19 +32,7 @@ sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
     # Hello World
-    $c->response->body( "Bienvenue!" );
-	
-}
-
-sub autorisation :Path :Args(0){
-	my ($self,$c) = @_;
-	my ($login,$password);
-	$login = $c->request->param('login');
-	$password = $c->request->param('pw');
-
-	unless ($c->model('text_db')->found_in($login) || !$login || !$password){
-		$c->model('text_db')->add({login=>$login,time=>$c->model('text_db')->timestamp,pw=>$password});
-	}
+    $c->response->body( $c->welcome_message );
 }
 
 =head2 default
@@ -56,7 +43,7 @@ Standard 404 error page
 
 sub default :Path {
     my ( $self, $c ) = @_;
-    $c->response->body( "Oups, cette page n'éxiste pas" );
+    $c->response->body( 'Page not found' );
     $c->response->status(404);
 }
 

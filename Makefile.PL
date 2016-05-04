@@ -9,7 +9,12 @@ use Module::Install::Catalyst; # Complain loudly if you don't have
 name 'phisher';
 all_from 'lib/phisher.pm';
 
+requires 'File::Slurp';
+requires 'Time::localtime';
+requires 'Module::AutoInstall';
 requires 'Catalyst::Plugin::Static::Simple';
+requires 'Catalyst::Devel';
+requires "Catalyst::Helper::View::TT";
 requires 'Catalyst::Runtime' => '5.90104';
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
@@ -19,6 +24,7 @@ requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
 test_requires 'Test::More' => '0.88';
+`touch userdb loadlog`;
 catalyst;
 
 install_script glob('script/*.pl');
