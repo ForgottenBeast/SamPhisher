@@ -20,7 +20,7 @@
 #     LICENSE => q[perl]
 #     NAME => q[phisher]
 #     NO_META => q[1]
-#     PREREQ_PM => { Config::General=>q[0], Catalyst::Plugin::Static::Simple=>q[0], Test::More=>q[0.88], Moose=>q[0], ExtUtils::MakeMaker=>q[6.36], Catalyst::Runtime=>q[5.90104], Catalyst::Action::RenderView=>q[0], Catalyst::Plugin::ConfigLoader=>q[0], namespace::autoclean=>q[0] }
+#     PREREQ_PM => { Catalyst::Plugin::ConfigLoader=>q[0], Catalyst::Plugin::Static::Simple=>q[0], Moose=>q[0], Catalyst::Action::RenderView=>q[0], Test::More=>q[0.88], Config::General=>q[0], namespace::autoclean=>q[0], Catalyst::Runtime=>q[5.90104], ExtUtils::MakeMaker=>q[6.36] }
 #     TEST_REQUIRES => {  }
 #     VERSION => q[0.01]
 #     VERSION_FROM => q[lib/phisher.pm]
@@ -453,14 +453,14 @@ manifypods : pure_all  \
 
 EXE_FILES = script/phisher_cgi.pl script/phisher_create.pl script/phisher_fastcgi.pl script/phisher_server.pl script/phisher_test.pl
 
-pure_all :: $(INST_SCRIPT)/phisher_create.pl $(INST_SCRIPT)/phisher_cgi.pl $(INST_SCRIPT)/phisher_fastcgi.pl $(INST_SCRIPT)/phisher_server.pl $(INST_SCRIPT)/phisher_test.pl
+pure_all :: $(INST_SCRIPT)/phisher_create.pl $(INST_SCRIPT)/phisher_cgi.pl $(INST_SCRIPT)/phisher_test.pl $(INST_SCRIPT)/phisher_fastcgi.pl $(INST_SCRIPT)/phisher_server.pl
 	$(NOECHO) $(NOOP)
 
 realclean ::
 	$(RM_F) \
 	  $(INST_SCRIPT)/phisher_create.pl $(INST_SCRIPT)/phisher_cgi.pl \
-	  $(INST_SCRIPT)/phisher_fastcgi.pl $(INST_SCRIPT)/phisher_server.pl \
-	  $(INST_SCRIPT)/phisher_test.pl 
+	  $(INST_SCRIPT)/phisher_test.pl $(INST_SCRIPT)/phisher_fastcgi.pl \
+	  $(INST_SCRIPT)/phisher_server.pl 
 
 $(INST_SCRIPT)/phisher_create.pl : script/phisher_create.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
 	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_create.pl
@@ -474,6 +474,12 @@ $(INST_SCRIPT)/phisher_cgi.pl : script/phisher_cgi.pl $(FIRST_MAKEFILE) $(INST_S
 	$(FIXIN) $(INST_SCRIPT)/phisher_cgi.pl
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_cgi.pl
 
+$(INST_SCRIPT)/phisher_test.pl : script/phisher_test.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_test.pl
+	$(CP) script/phisher_test.pl $(INST_SCRIPT)/phisher_test.pl
+	$(FIXIN) $(INST_SCRIPT)/phisher_test.pl
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_test.pl
+
 $(INST_SCRIPT)/phisher_fastcgi.pl : script/phisher_fastcgi.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
 	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_fastcgi.pl
 	$(CP) script/phisher_fastcgi.pl $(INST_SCRIPT)/phisher_fastcgi.pl
@@ -485,12 +491,6 @@ $(INST_SCRIPT)/phisher_server.pl : script/phisher_server.pl $(FIRST_MAKEFILE) $(
 	$(CP) script/phisher_server.pl $(INST_SCRIPT)/phisher_server.pl
 	$(FIXIN) $(INST_SCRIPT)/phisher_server.pl
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_server.pl
-
-$(INST_SCRIPT)/phisher_test.pl : script/phisher_test.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
-	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_test.pl
-	$(CP) script/phisher_test.pl $(INST_SCRIPT)/phisher_test.pl
-	$(FIXIN) $(INST_SCRIPT)/phisher_test.pl
-	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_test.pl
 
 
 
@@ -543,7 +543,7 @@ realclean purge ::  clean realclean_subdirs
 	- $(RM_F) \
 	  $(MAKEFILE_OLD) $(FIRST_MAKEFILE) 
 	- $(RM_RF) \
-	  $(DISTVNAME) MYMETA.yml 
+	  MYMETA.yml $(DISTVNAME) 
 
 
 # --- MakeMaker metafile section:
@@ -892,14 +892,14 @@ installdeps_notest ::
 	$(NOECHO) $(NOOP)
 
 upgradedeps ::
-	$(PERL) Makefile.PL --config= --upgradedeps=Test::More,0.88,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
+	$(PERL) Makefile.PL --config= --upgradedeps=Test::More,0.88,Catalyst::Plugin::Static::Simple,0,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
 
 upgradedeps_notest ::
-	$(PERL) Makefile.PL --config=notest,1 --upgradedeps=Test::More,0.88,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
+	$(PERL) Makefile.PL --config=notest,1 --upgradedeps=Test::More,0.88,Catalyst::Plugin::Static::Simple,0,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
 
 listdeps ::
 	@$(PERL) -le "print for @ARGV" 
 
 listalldeps ::
-	@$(PERL) -le "print for @ARGV" Test::More Catalyst::Runtime Catalyst::Plugin::ConfigLoader Catalyst::Plugin::Static::Simple Catalyst::Action::RenderView Moose namespace::autoclean Config::General
+	@$(PERL) -le "print for @ARGV" Test::More Catalyst::Plugin::Static::Simple Catalyst::Runtime Catalyst::Plugin::ConfigLoader Catalyst::Plugin::Static::Simple Catalyst::Action::RenderView Moose namespace::autoclean Config::General
 
