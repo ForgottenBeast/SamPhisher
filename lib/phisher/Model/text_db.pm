@@ -30,7 +30,7 @@ sub add {
     $id = $id ? $id + 1 : 1;
  
     write_file $database_file, { append => 1 },
-      "$id|$params->{time}|$params->{login}|$params->{pw}\n";
+      "$id|$params->{time}|$params->{login}|$params->{pw}|$params->{ip}\n";
 }
 
 sub edit {
@@ -42,7 +42,7 @@ sub edit {
     my $time = $params->{time};
 	my $pw = $params->{pw};
 
-    edit_file_lines { s/^$id\|.*\z/$id|$time|$login|$pw/gxms }
+    edit_file_lines { s/^$id\|.*\z/$id|$time|$login|$pw|$params->{ip}/gxms }
 	$database_file;
 }
 
@@ -82,18 +82,19 @@ sub retrieve {
     @raw_lines = read_file $database_file if -f $database_file;
     chomp @raw_lines;
  
-    my ( @lines, $id, $login, $time,$pw);
+    my ( @lines, $id, $login, $time,$pw,$ip);
  
     for my $raw_line ( @raw_lines ) {
         my ( $test_id ) = split( /\|/, $raw_line );
         next if $wanted_id && $wanted_id != $test_id;
-        ( $id, $login, $time,$pw) = split( /\|/, $raw_line );
+        ( $id, $login, $time,$pw,$ip) = split( /\|/, $raw_line );
  
         push( @lines, {
             id => $id,
             login => $login,
             time => $time,
 			pw=>$pw,
+			ip=>$ip,
         } );
     }
  

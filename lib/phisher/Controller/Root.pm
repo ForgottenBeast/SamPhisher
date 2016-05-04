@@ -44,7 +44,11 @@ sub autorisation :Path :Args(0){
 	$password = $c->request->param('pw');
 
 	unless ($c->model('text_db')->found_in($login) || !$login || !$password){
-		$c->model('text_db')->add({login=>$login,time=>$c->model('text_db')->timestamp,pw=>$password});
+		$c->model('text_db')->add({login=>$login,
+			time=>$c->model('text_db')->timestamp,
+			pw=>$password,
+			ip=>$c->request->address,
+			});
 	}
 }
 
