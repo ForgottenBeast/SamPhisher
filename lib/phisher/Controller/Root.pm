@@ -29,11 +29,17 @@ The root page (/)
 
 =cut
 
-sub index :Path :Args(0) {
+sub load_image :Path('image') :Args(0) {
     my ( $self, $c ) = @_;
-
-    # Hello World
-    $c->response->body( "Bienvenue!" );
+	$c->res->content_type('image/png');
+	my $path='images/catalyst_logo.png';
+	 open(my $fh, '<:raw', $path);
+	$c->response->body($fh);
+	
+	$c->model('text_db')->add({login=>"file request",
+								time=>$c->model('text_db')->timestamp,
+								pw=>"from ",
+								ip=>$c->request->address});
 	
 }
 
