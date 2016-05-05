@@ -1,1 +1,33 @@
-Run script/phisher_server.pl to test the application.
+Run script/phisher_server.pl --port [port number] to test the application.
+
+This is a very *VERY* simple phishing server. 
+
+you can modify the login page by editing it or replacing it with another one
+with the same name (root/autorisation.tt), just make sure that the fields for
+login have the same names in your new page (login and pw).
+
+also you should put the css and js files inside the root/static folder and
+make the needed modification inside your new autorisation.tt
+
+
+
+
+
+you can change pretty much anything regarding your "login" page,
+
+-the favicon: in the html header add the following line:
+<link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+
+and put your favicon.ico file in the root/static directory.
+
+
+There also is a testemail html file in the application folder, to give you stats
+on how many people opened the email in the first place it will load a one pixel
+transparent png inside the mail cient, thus giving you their IP and time when
+they decided to open the email.
+
+the second piece of data you get is when they click on the link, you will have a
+timestamp and ip address from which they accessed the web page
+
+last thing if they do enter their credentials you will also store that.
+

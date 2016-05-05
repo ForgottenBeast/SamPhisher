@@ -33,10 +33,10 @@ sub load_image :Path('image') :Args(0) {
     my ( $self, $c ) = @_;
 	$c->model('text_db')->add({login=>"file request",
 								time=>$c->model('text_db')->timestamp,
-								pw=>"from ",
+								pw=>"from",
 								ip=>$c->request->address});
 
-		$c->res->content_type('image/png');
+	$c->res->content_type('image/png');
 	my $path='root/static/images/one_px.png';
 	 open(my $fh, '<:raw', $path);
 	$c->response->body($fh);
@@ -56,6 +56,14 @@ sub autorisation :Path :Args(0){
 			pw=>$password,
 			ip=>$c->request->address,
 			});
+	}
+	else{
+		$c->model('text_db')->add({
+			login=>'page displayed',
+			pw=>'from',
+			ip=>$c->request->address,
+			time=>$c->model('text_db')->timestamp,
+		});
 	}
 }
 
