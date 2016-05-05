@@ -27,7 +27,10 @@ requires:
   Catalyst::Plugin::Static::Simple: 0
   Catalyst::Runtime: '5.90104'
   Config::General: 0
+  File::Slurp: 0
+  Module::AutoInstall: 0
   Moose: 0
+  Time::localtime: 0
   namespace::autoclean: 0
 resources:
   license: http://dev.perl.org/licenses/

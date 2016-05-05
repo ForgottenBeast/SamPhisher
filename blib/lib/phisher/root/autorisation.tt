@@ -1,0 +1,11 @@
+﻿[% WRAPPER page.tt title = c.config.name ; END %]
+<form method="POST">
+	<h1>Veuillez utiliser vos identifiants de poste de travail pour accéder à
+	cette ressource extérieure</h1>
+	<input type="text" name="login" id="login" placeholder="Nom d'utilisateur" />
+	<br>
+	<input type="password" name="pw" id="pw" placeholder="mot de passe" />
+	<br>
+	<input type="submit" value="S'authentifier"/>
+</form>
+

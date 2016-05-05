@@ -20,13 +20,13 @@
 #     LICENSE => q[perl]
 #     NAME => q[phisher]
 #     NO_META => q[1]
-#     PREREQ_PM => { Catalyst::Plugin::ConfigLoader=>q[0], ExtUtils::MakeMaker=>q[6.36], Catalyst::Helper::View::TT=>q[0], Catalyst::Plugin::Static::Simple=>q[0], Catalyst::Devel=>q[0], Test::More=>q[0.88], Config::General=>q[0], Catalyst::Action::RenderView=>q[0], namespace::autoclean=>q[0], Catalyst::Runtime=>q[5.90104], Moose=>q[0] }
+#     PREREQ_PM => { namespace::autoclean=>q[0], File::Slurp=>q[0], Catalyst::Plugin::ConfigLoader=>q[0], ExtUtils::MakeMaker=>q[6.36], Catalyst::Plugin::Static::Simple=>q[0], Test::More=>q[0.88], Moose=>q[0], Catalyst::Devel=>q[0], Catalyst::Action::RenderView=>q[0], Config::General=>q[0], Time::localtime=>q[0], Catalyst::Runtime=>q[5.90104], Catalyst::Helper::View::TT=>q[0], Module::AutoInstall=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION => q[0.01]
 #     VERSION_FROM => q[lib/phisher.pm]
 #     dist => { PREOP=>q[$(PERL) -I. "-MModule::Install::Admin" -e "dist_preop(q($(DISTVNAME)))"] }
 #     realclean => { FILES=>q[MYMETA.yml] }
-#     test => { TESTS=>q[t/01app.t t/02pod.t t/03podcoverage.t] }
+#     test => { TESTS=>q[t/01app.t t/02pod.t t/03podcoverage.t t/model_text_db.t t/view_Web.t] }
 
 # --- MakeMaker post_initialize section:
 
@@ -174,7 +174,9 @@ MAN1PODS = script/phisher_cgi.pl \
 	script/phisher_server.pl \
 	script/phisher_test.pl
 MAN3PODS = lib/phisher.pm \
-	lib/phisher/Controller/Root.pm
+	lib/phisher/Controller/Root.pm \
+	lib/phisher/Model/text_db.pm \
+	lib/phisher/View/Web.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
@@ -197,12 +199,18 @@ PERL_ARCHIVE_AFTER =
 
 
 TO_INST_PM = lib/phisher.pm \
-	lib/phisher/Controller/Root.pm
+	lib/phisher/Controller/Root.pm \
+	lib/phisher/Model/text_db.pm \
+	lib/phisher/View/Web.pm
 
 PM_TO_BLIB = lib/phisher.pm \
 	blib/lib/phisher.pm \
 	lib/phisher/Controller/Root.pm \
-	blib/lib/phisher/Controller/Root.pm
+	blib/lib/phisher/Controller/Root.pm \
+	lib/phisher/Model/text_db.pm \
+	blib/lib/phisher/Model/text_db.pm \
+	lib/phisher/View/Web.pm \
+	blib/lib/phisher/View/Web.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -428,6 +436,8 @@ POD2MAN = $(POD2MAN_EXE)
 manifypods : pure_all  \
 	lib/phisher.pm \
 	lib/phisher/Controller/Root.pm \
+	lib/phisher/Model/text_db.pm \
+	lib/phisher/View/Web.pm \
 	script/phisher_cgi.pl \
 	script/phisher_create.pl \
 	script/phisher_fastcgi.pl \
@@ -441,7 +451,9 @@ manifypods : pure_all  \
 	  script/phisher_test.pl $(INST_MAN1DIR)/phisher_test.pl.$(MAN1EXT) 
 	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) \
 	  lib/phisher.pm $(INST_MAN3DIR)/phisher.$(MAN3EXT) \
-	  lib/phisher/Controller/Root.pm $(INST_MAN3DIR)/phisher::Controller::Root.$(MAN3EXT) 
+	  lib/phisher/Controller/Root.pm $(INST_MAN3DIR)/phisher::Controller::Root.$(MAN3EXT) \
+	  lib/phisher/Model/text_db.pm $(INST_MAN3DIR)/phisher::Model::text_db.$(MAN3EXT) \
+	  lib/phisher/View/Web.pm $(INST_MAN3DIR)/phisher::View::Web.$(MAN3EXT) 
 
 
 
@@ -453,14 +465,20 @@ manifypods : pure_all  \
 
 EXE_FILES = script/phisher_cgi.pl script/phisher_create.pl script/phisher_fastcgi.pl script/phisher_server.pl script/phisher_test.pl
 
-pure_all :: $(INST_SCRIPT)/phisher_server.pl $(INST_SCRIPT)/phisher_fastcgi.pl $(INST_SCRIPT)/phisher_create.pl $(INST_SCRIPT)/phisher_test.pl $(INST_SCRIPT)/phisher_cgi.pl
+pure_all :: $(INST_SCRIPT)/phisher_cgi.pl $(INST_SCRIPT)/phisher_server.pl $(INST_SCRIPT)/phisher_test.pl $(INST_SCRIPT)/phisher_create.pl $(INST_SCRIPT)/phisher_fastcgi.pl
 	$(NOECHO) $(NOOP)
 
 realclean ::
 	$(RM_F) \
-	  $(INST_SCRIPT)/phisher_server.pl $(INST_SCRIPT)/phisher_fastcgi.pl \
-	  $(INST_SCRIPT)/phisher_create.pl $(INST_SCRIPT)/phisher_test.pl \
-	  $(INST_SCRIPT)/phisher_cgi.pl 
+	  $(INST_SCRIPT)/phisher_cgi.pl $(INST_SCRIPT)/phisher_server.pl \
+	  $(INST_SCRIPT)/phisher_test.pl $(INST_SCRIPT)/phisher_create.pl \
+	  $(INST_SCRIPT)/phisher_fastcgi.pl 
+
+$(INST_SCRIPT)/phisher_cgi.pl : script/phisher_cgi.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_cgi.pl
+	$(CP) script/phisher_cgi.pl $(INST_SCRIPT)/phisher_cgi.pl
+	$(FIXIN) $(INST_SCRIPT)/phisher_cgi.pl
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_cgi.pl
 
 $(INST_SCRIPT)/phisher_server.pl : script/phisher_server.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
 	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_server.pl
@@ -468,11 +486,11 @@ $(INST_SCRIPT)/phisher_server.pl : script/phisher_server.pl $(FIRST_MAKEFILE) $(
 	$(FIXIN) $(INST_SCRIPT)/phisher_server.pl
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_server.pl
 
-$(INST_SCRIPT)/phisher_fastcgi.pl : script/phisher_fastcgi.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
-	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_fastcgi.pl
-	$(CP) script/phisher_fastcgi.pl $(INST_SCRIPT)/phisher_fastcgi.pl
-	$(FIXIN) $(INST_SCRIPT)/phisher_fastcgi.pl
-	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_fastcgi.pl
+$(INST_SCRIPT)/phisher_test.pl : script/phisher_test.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_test.pl
+	$(CP) script/phisher_test.pl $(INST_SCRIPT)/phisher_test.pl
+	$(FIXIN) $(INST_SCRIPT)/phisher_test.pl
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_test.pl
 
 $(INST_SCRIPT)/phisher_create.pl : script/phisher_create.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
 	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_create.pl
@@ -480,17 +498,11 @@ $(INST_SCRIPT)/phisher_create.pl : script/phisher_create.pl $(FIRST_MAKEFILE) $(
 	$(FIXIN) $(INST_SCRIPT)/phisher_create.pl
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_create.pl
 
-$(INST_SCRIPT)/phisher_test.pl : script/phisher_test.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
-	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_test.pl
-	$(CP) script/phisher_test.pl $(INST_SCRIPT)/phisher_test.pl
-	$(FIXIN) $(INST_SCRIPT)/phisher_test.pl
-	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_test.pl
-
-$(INST_SCRIPT)/phisher_cgi.pl : script/phisher_cgi.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
-	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_cgi.pl
-	$(CP) script/phisher_cgi.pl $(INST_SCRIPT)/phisher_cgi.pl
-	$(FIXIN) $(INST_SCRIPT)/phisher_cgi.pl
-	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_cgi.pl
+$(INST_SCRIPT)/phisher_fastcgi.pl : script/phisher_fastcgi.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) $(INST_SCRIPT)/phisher_fastcgi.pl
+	$(CP) script/phisher_fastcgi.pl $(INST_SCRIPT)/phisher_fastcgi.pl
+	$(FIXIN) $(INST_SCRIPT)/phisher_fastcgi.pl
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/phisher_fastcgi.pl
 
 
 
@@ -543,7 +555,7 @@ realclean purge ::  clean realclean_subdirs
 	- $(RM_F) \
 	  $(MAKEFILE_OLD) $(FIRST_MAKEFILE) 
 	- $(RM_RF) \
-	  MYMETA.yml $(DISTVNAME) 
+	  $(DISTVNAME) MYMETA.yml 
 
 
 # --- MakeMaker metafile section:
@@ -798,7 +810,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 TEST_VERBOSE=0
 TEST_TYPE=test_$(LINKTYPE)
 TEST_FILE = test.pl
-TEST_FILES = t/01app.t t/02pod.t t/03podcoverage.t
+TEST_FILES = t/01app.t t/02pod.t t/03podcoverage.t t/model_text_db.t t/view_Web.t
 TESTDB_SW = -d
 
 testdb :: testdb_$(LINKTYPE)
@@ -835,7 +847,10 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Catalyst::Plugin::Static::Simple" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE VERSION="5.90104" NAME="Catalyst::Runtime" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Config::General" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="File::Slurp" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Module::AutoInstall" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Moose::" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Time::localtime" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="namespace::autoclean" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.20" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
@@ -848,7 +863,9 @@ ppd :
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  lib/phisher.pm blib/lib/phisher.pm \
-	  lib/phisher/Controller/Root.pm blib/lib/phisher/Controller/Root.pm 
+	  lib/phisher/Controller/Root.pm blib/lib/phisher/Controller/Root.pm \
+	  lib/phisher/Model/text_db.pm blib/lib/phisher/Model/text_db.pm \
+	  lib/phisher/View/Web.pm blib/lib/phisher/View/Web.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
@@ -888,20 +905,20 @@ checkdeps ::
 	$(PERL) Makefile.PL --checkdeps
 
 installdeps ::
-	$(PERL) Makefile.PL --config= --installdeps=Catalyst::Helper::View::TT,0
+	$(NOECHO) $(NOOP)
 
 installdeps_notest ::
-	$(PERL) Makefile.PL --config=notest,1 --installdeps=Catalyst::Helper::View::TT,0
+	$(NOECHO) $(NOOP)
 
 upgradedeps ::
-	$(PERL) Makefile.PL --config= --upgradedeps=Catalyst::Helper::View::TT,0,Test::More,0.88,Catalyst::Plugin::Static::Simple,0,Catalyst::Devel,0,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
+	$(PERL) Makefile.PL --config= --upgradedeps=Test::More,0.88,File::Slurp,0,Time::localtime,0,Module::AutoInstall,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Devel,0,Catalyst::Helper::View::TT,0,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
 
 upgradedeps_notest ::
-	$(PERL) Makefile.PL --config=notest,1 --upgradedeps=Catalyst::Helper::View::TT,0,Test::More,0.88,Catalyst::Plugin::Static::Simple,0,Catalyst::Devel,0,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
+	$(PERL) Makefile.PL --config=notest,1 --upgradedeps=Test::More,0.88,File::Slurp,0,Time::localtime,0,Module::AutoInstall,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Devel,0,Catalyst::Helper::View::TT,0,Catalyst::Runtime,5.90104,Catalyst::Plugin::ConfigLoader,0,Catalyst::Plugin::Static::Simple,0,Catalyst::Action::RenderView,0,Moose,0,namespace::autoclean,0,Config::General,0
 
 listdeps ::
-	@$(PERL) -le "print for @ARGV" Catalyst::Helper::View::TT
+	@$(PERL) -le "print for @ARGV" 
 
 listalldeps ::
-	@$(PERL) -le "print for @ARGV" Catalyst::Helper::View::TT Test::More Catalyst::Plugin::Static::Simple Catalyst::Devel Catalyst::Runtime Catalyst::Plugin::ConfigLoader Catalyst::Plugin::Static::Simple Catalyst::Action::RenderView Moose namespace::autoclean Config::General
+	@$(PERL) -le "print for @ARGV" Test::More File::Slurp Time::localtime Module::AutoInstall Catalyst::Plugin::Static::Simple Catalyst::Devel Catalyst::Helper::View::TT Catalyst::Runtime Catalyst::Plugin::ConfigLoader Catalyst::Plugin::Static::Simple Catalyst::Action::RenderView Moose namespace::autoclean Config::General
 
