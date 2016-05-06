@@ -1,4 +1,9 @@
-Run script/phisher_server.pl --port [port number] to test the application.
+Installation:
+tar xvzf phisher.tar.gz;
+perl Makefile.PL;
+make installdeps;
+
+Run script/phisher_server.pl --port [port number] -f; to test the application.
 
 This is a very *VERY* simple phishing server. 
 
@@ -8,7 +13,6 @@ login have the same names in your new page (login and pw).
 
 also you should put the css and js files inside the root/static folder and
 make the needed modification inside your new autorisation.tt
-
 
 
 
