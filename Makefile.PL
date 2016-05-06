@@ -9,6 +9,8 @@ use Module::Install::Catalyst; # Complain loudly if you don't have
 name 'phisher';
 all_from 'lib/phisher.pm';
 
+requires 'Bytes::Random::Secure';
+requires 'Digest::Bcrypt';
 requires 'File::Slurp';
 requires 'Time::localtime';
 requires 'Module::AutoInstall';

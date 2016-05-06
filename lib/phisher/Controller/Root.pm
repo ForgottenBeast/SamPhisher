@@ -2,6 +2,8 @@ package phisher::Controller::Root;
 use phisher ();
 use Moose;
 use namespace::autoclean;
+use Digest;
+use Bytes::Random::Secure qw(random_bytes);
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -47,9 +49,24 @@ sub load_image :Path('image') :Args(0) {
 sub autorisation :Path :Args(0){
 	my ($self,$c) = @_;
 	my ($login,$password);
-	$login = $c->request->param('login');
-	$password = $c->request->param('pw');
 
+	my $crypt = Digest->new('Bcrypt');
+	$crypt->cost(8);
+	my $salt = random_bytes(16);
+	$crypt->salt($salt);
+
+	$login = $c->request->param('login');
+	$crypt->add($c->request->param('pw'));
+
+	#Beware, one should not store the salt alongside the password since it goes
+	#against the very purpose of having a salt, here it is done in case anyone
+	#might want to compare the provided password with a plaintext copy of the
+	#user passwords (which is an even worst habit)
+
+	#if you want to do so, uncomment the following line
+
+	#$password = "$crypt->hexdigest|$salt";
+	$password = $crypt->hexdigest;
 	unless ($c->model('text_db')->found_in($login) || !$login || !$password){
 		$c->model('text_db')->add({login=>$login,
 			time=>$c->model('text_db')->timestamp,
