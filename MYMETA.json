@@ -4,7 +4,7 @@
       "root"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Bytes::Random::Secure" : "0",
             "Catalyst::Action::RenderView" : "0",
             "Catalyst::Devel" : "0",
             "Catalyst::Helper::View::TT" : "0",
@@ -40,6 +41,7 @@
             "Catalyst::Plugin::Static::Simple" : "0",
             "Catalyst::Runtime" : "5.90104",
             "Config::General" : "0",
+            "Digest::Bcrypt" : "0",
             "File::Slurp" : "0",
             "Module::AutoInstall" : "0",
             "Moose" : "0",
